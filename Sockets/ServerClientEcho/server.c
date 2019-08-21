@@ -27,8 +27,12 @@ newfd=accept(sockfd,(struct sockaddr*)&cliaddr,&len);
 // printf("hi");
 //Receiving the message
 n=read(newfd,buff,sizeof(buff));
-printf("\nReceived Message is: \t%s\n",buff);
-close(sockfd);
+printf("\nReceived Message is: \t%s ",buff);
+printf("\n");
+printf("Enter the message:  ");
+scanf("%s",buff);
+n=write(newfd,buff,sizeof(buff));
+
 close(newfd);
 return 0;
 }

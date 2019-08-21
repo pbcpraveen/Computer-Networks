@@ -25,6 +25,10 @@ connect(sockfd,(struct sockaddr*)&servaddr,sizeof(servaddr));
 printf("Enter the message:  ");
 scanf("%s",buff);
 n=write(sockfd,buff,sizeof(buff));
+printf("Sent Message: %s\n",buff);
+n=read(sockfd,buff,sizeof(buff));
+printf("\nReceived Message is: \t%s ",buff);
+printf("\n");
 close(sockfd);
 return 0;
 }

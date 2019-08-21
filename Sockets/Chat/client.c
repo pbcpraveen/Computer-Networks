@@ -26,7 +26,7 @@ int main(int argc,char **argv)
     printf("Enter the message:  ");
     scanf("%s",buff);
     n=write(sockfd,buff,sizeof(buff));
-    newfd=accept(sockfd,(struct sockaddr*)&cliaddr,&len);
+    newfd=accept(sockfd,(struct sockaddr*)&servaddr,&len);
     n=read(newfd,buff,sizeof(buff));
     printf("\nReceived Message is: \t%s\n",buff); 
   }
