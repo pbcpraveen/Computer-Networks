@@ -1,0 +1,6 @@
+Hi this file will be requested by
+the client program. The server will 
+covert the file to a stream and sent it
+to the client.
+
+ 

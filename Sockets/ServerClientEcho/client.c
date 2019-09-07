@@ -27,8 +27,7 @@ scanf("%s",buff);
 n=write(sockfd,buff,sizeof(buff));
 printf("Sent Message: %s\n",buff);
 n=read(sockfd,buff,sizeof(buff));
-printf("\nReceived Message is: \t%s ",buff);
-printf("\n");
+printf("Received Reply:%s\n",buff);
 close(sockfd);
 return 0;
 }
