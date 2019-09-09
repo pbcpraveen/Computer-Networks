@@ -5,7 +5,8 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <unistd.h>
-
+#include <stdlib.h>
+#include <string.h>
 int main(char **argc,int args)
 {
   //create socket
@@ -17,13 +18,13 @@ int main(char **argc,int args)
   clientaddr = (struct sockaddr_in*) malloc(sizeof(struct sockaddr_in));
   
   // clear address memory
-  bzero(serveraddr,sizeof(*serveraddr));
-  bzero(clientaddr,sizeof(*serveraddr));
+  bzero(serveraddr,sizeof(struct sockaddr_in));
+  bzero(clientaddr,sizeof(struct sockaddr_in));
   
   // initialise address structure for server
   (*serveraddr).sin_family=AF_INET;
   (*serveraddr).sin_addr.s_addr=INADDR_ANY;
-  (*serveraddr).sin_port=htons(7889);
+  (*serveraddr).sin_port=htons(7890);
 
   //bind the socket structure to its address
   if (bind(sfd,serveraddr,sizeof(*serveraddr))<0)
@@ -42,35 +43,39 @@ int main(char **argc,int args)
   struct sockaddr_in clist[10];
   while(ch == 'y')
     {
-      int f1 = accept(sfd,clientaddr,sizeof(*clientaddr));
+      int f1 = accept(sfd,*clientaddr,sizeof(struct sockaddr_in));
       fd[i] = f1;
+      printf("%d",f1);
       clist[i] = *clientaddr;
-      printf("new connection recieved");
+      printf("\nnew connection received: ");
       char *ip = inet_ntoa(clist[i].sin_addr);
       strcpy(iplist[i],ip);
       i++;
       printf(" %s\n",ip);
-      printf("\nenter y to connect to another client:");
-      scanf("%c",ch);
+      printf("\nenter y to connect to another client: ");
+      scanf("%c",&ch);
+      bzero(clientaddr,sizeof(struct sockaddr_in));
     }
 
   char* ipreq;
   char* macreply;
   macreply = (char*) malloc(100);
   ipreq = (char*) malloc(100);
-  printf("enter the ip to be reuested");
+  printf("enter the ip to be requested: ");
   scanf("%s",ipreq);
+  printf("%s\n",ipreq);
   int total_connections =i;
   i = 0;
   while(i<total_connections){
-    write(fd[i],ipreq,sizeof(*ipreq));
-    printf("request sent to:\t%s\n",clist[i]);
-    read(fd[i],macreply,sizeof(*macreply));
+    write(fd[i],ipreq,100);
+    printf("request sent to:\t%s\n",iplist[i]);
+    read(fd[i],macreply,99);
 
     if(strcmp(macreply,"null") != 0){
-      printf("\nrecieved mac of %s:\t%s\n",clist[i],macreply);
+      printf("\nrecieved mac of %s:\t%s\n",iplist[i],macreply);
       char* buff = "10110110";
       write(fd[i],buff,sizeof(buff));
+      i++;
     }
     else{
       char* buff = "ip mismatch";
