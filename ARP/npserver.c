@@ -22,7 +22,7 @@ int main(char **argc,int args)
   // initialise address structure for server
   serveraddr.sin_family=AF_INET;
   serveraddr.sin_addr.s_addr=INADDR_ANY;
-  serveraddr.sin_port=htons(7891);
+  serveraddr.sin_port=htons(7892);
 
   //bind the socket structure to its address
   if (bind(sfd,(struct sockaddr*)&serveraddr,sizeof(serveraddr))<0)
@@ -79,12 +79,13 @@ int main(char **argc,int args)
       printf("\nrecieved mac of %s:\t%s\n",iplist[i],macreply);
       char buff[] = "10110110";
       write(fd[i],buff,sizeof(buff));
-      i++;
+    
     }
     else{
       char buff[] = "ip mismatch";
       write(fd[i],buff,sizeof(buff));
     }
+i++;
   }
 
   close(sfd);

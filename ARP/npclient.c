@@ -15,7 +15,7 @@ int main(char **argc,int args)
   mac = (char*) malloc(100);
   ip = (char*) malloc(100);
   for(int i = 0; i<100;i++) ip[i] = '\0';
-  FILE* fp = popen("ifconfig | grep \"ether*\" | tr -d ' ' | tr -d '\\t' | cut -c 6-22|head -n 1", "r");
+  FILE* fp = popen("fconfig -a | grep -Po 'HWaddr \\K.*$'", "r");
   if (fgets(mac, 99, fp) != NULL) {
     printf("The clients mac is : %s\n", mac);
   }
