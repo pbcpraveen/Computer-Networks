@@ -25,11 +25,19 @@ set n0 [$ns node]
 set n1 [$ns node]
 set n2 [$ns node]
 set n3 [$ns node]
+set n4 [$ns node]
+set n5 [$ns node]
+
 
 #Create links between the nodes
 $ns duplex-link $n0 $n2 2Mb 10ms DropTail
 $ns duplex-link $n1 $n2 2Mb 10ms DropTail
-$ns duplex-link $n2 $n3 1.7Mb 20ms DropTail
+$ns simplex-link $n2 $n3 0.3Mb 100ms DropTail
+$ns simplex-link $n3 $n2 0.3Mb 100ms DropTail
+$ns duplex-link $n3 $n4 0.5Mb 40ms DropTail
+$ns duplex-link $n3 $n5 0.5Mb 40ms DropTail
+
+
 
 #Set Queue Size of link (n2-n3) to 10
 $ns queue-limit $n2 $n3 10
@@ -37,19 +45,24 @@ $ns queue-limit $n2 $n3 10
 #Give node position (for NAM)
 $ns duplex-link-op $n0 $n2 orient right-down
 $ns duplex-link-op $n1 $n2 orient right-up
-$ns duplex-link-op $n2 $n3 orient right
+$ns simplex-link-op $n2 $n3 orient right
+$ns duplex-link-op $n3 $n4  orient right-up
+$ns duplex-link-op $n3 $n5  orient right-down
+
 
 #Monitor the queue for link (n2-n3). (for NAM)
-$ns duplex-link-op $n2 $n3 queuePos 0.5
+$ns duplex-link-op $n2 $n3 queuePos 10
 
 #Setup a TCP connection
-set tcp [new Agent/TCP]
+set tcp [new Agent/TCP/Newreno]
 $tcp set class_ 2
 $ns attach-agent $n0 $tcp
-set sink [new Agent/TCPSink]
-$ns attach-agent $n3 $sink
+set sink [new Agent/TCPSink/DelAck]
+$ns attach-agent $n4 $sink
 $ns connect $tcp $sink
 $tcp set fid_ 1
+$tcp set window_ 8000
+$tcp set packetSize_ 512
 
 #Setup a FTP over TCP connection
 set ftp [new Application/FTP]
@@ -60,7 +73,7 @@ $ftp set type_ FTP
 set udp [new Agent/UDP]
 $ns attach-agent $n1 $udp
 set null [new Agent/Null]
-$ns attach-agent $n3 $null
+$ns attach-agent $n5 $null
 $ns connect $udp $null
 $udp set fid_ 2
 
@@ -68,8 +81,8 @@ $udp set fid_ 2
 set cbr [new Application/Traffic/CBR]
 $cbr attach-agent $udp
 $cbr set type_ CBR
-$cbr set packet_size_ 1000
-$cbr set rate_ 1mb
+$cbr set packet_size_ 1024
+$cbr set rate_ 0.01mb
 $cbr set random_ false
 
 #Schedule events for the CBR and FTP agents
@@ -79,7 +92,7 @@ $ns at 4.0 "$ftp stop"
 $ns at 4.5 "$cbr stop"
 
 #Detach tcp and sink agents (not really necessary)
-$ns at 4.5 "$ns detach-agent $n0 $tcp ; $ns detach-agent $n3 $sink"
+$ns at 4.5 "$ns detach-agent $n0 $tcp ; $ns detach-agent $n5 $sink"
 
 #Call the finish procedure after 5 seconds of simulation time
 $ns at 5.0 "finish"
